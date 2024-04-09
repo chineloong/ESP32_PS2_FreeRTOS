@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "BluetoothSerial.h"
-
+#include "stepping_motor.h"
+#include "ControlTask.h"
 BluetoothSerial SerialBT;
 
 void BLE_Init()
@@ -12,6 +13,7 @@ void BLE_Init()
 
 void BLE_Task(void* pvParameter)
 {
+
     while(1)
     {
         if (Serial.available())
@@ -21,7 +23,10 @@ void BLE_Task(void* pvParameter)
         if (SerialBT.available())
         {
             Serial.write(SerialBT.read());
+            order = SerialBT.read();
         }
+        else 
+            order = STOP;
         vTaskDelay(50);
     }
 }

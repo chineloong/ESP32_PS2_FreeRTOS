@@ -1,10 +1,41 @@
 #include "stepping_motor.h"
 #include "arduino.h"
+#include "ESP32Servo.h"
+
+Servo mainServo;//开合舵机
+Servo Servo2;
+
+
+
+const int freq = 5000;//设置频率
+const int ledChannel = 0;//通道号，取值0 ~ 15
+const int resolution = 8;//计数位数，取值0 ~ 20
 
 void motor_init(void)
 {
     Serial2.begin(115200);
+    mainServo.attach(mainServoPin);
+    Servo2.attach(ServoPin);
+    mainServo.write(0);
+    Servo2.write(0);
+
+    pinMode(mainmotorpin1,OUTPUT);
+    pinMode(mainmotorpin2,OUTPUT);
+    pinMode(dirmotorpin1,OUTPUT); 
+    pinMode(dirmotorpin2,OUTPUT);
+    pinMode(smallmotorpin1,OUTPUT);
+    pinMode(smallmotorpin2,OUTPUT);
+
+
+    
+    // configure LED PWM functionalitites
+     ledcSetup(ledChannel, freq, resolution);
+  
+    // attach the channel to the GPIO to be controlled
+    ledcAttachPin(speedPin, ledChannel);//将 LEDC 通道绑定到指定 IO 口上以实现输出
+    Serial.printf("motor init \r\n");
 }
+
 /********
  * 函数名：
  * 参数：
@@ -65,4 +96,34 @@ void motor_pos(uint8_t num,uint8_t dir,uint16_t speed,uint8_t acc,uint32_t dista
     size = sizeof(order)/sizeof(order[1]);
     Serial2.write(order,size); 
 
+}
+
+/**
+电机驱动函数
+speed范围0-100
+**/
+void motor(short speed,short dir,short ena,short pin1,short pin2)
+{
+  if(speed!=0 && (pin1 == 25 || pin1 == 33))
+    //ledcWrite(ledChannel,speed);
+
+  if(ena == 0)
+  {
+    digitalWrite(pin1,HIGH);
+    digitalWrite(pin2,HIGH);
+  }
+  else 
+  {
+    if(dir)
+    {
+      digitalWrite(pin1,HIGH);
+      digitalWrite(pin2,LOW);
+
+    }
+    else
+    {
+      digitalWrite(pin1,LOW);
+      digitalWrite(pin2,HIGH);
+    }
+  }
 }
